@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pt-br">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Grade 6×6 de Ícones — classes só no elemento</title>
+  <title>6×6 Icon Grid — classes only on the element</title>
 
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -15,16 +15,19 @@
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <!-- Line Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
-  <!-- Devicon (logos de tecnologia) -->
+  <!-- Devicon (tech logos) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
 
   <style>
     :root {
       --bg: #0e0f13;
       --card: #151821;
-      --fg: #ffffff; /* texto branco */
+      --fg: #ffffff; /* white text */
       --muted: #9aa3b2;
       --accent: #5b9cff;
+      --overlay: rgba(0, 0, 0, .6);
+      --modal: #121520;
+      --border: #1f2431;
     }
     * { box-sizing: border-box; }
     body {
@@ -33,18 +36,10 @@
       color: var(--fg);
       min-height: 100dvh; display: grid; place-items: center; padding: 32px;
     }
-    .wrap {
-      max-width: 1100px; width: 100%;
-    }
-    header {
-      text-align: center; margin-bottom: 20px;
-    }
-    header h1 {
-      margin: 0 0 6px; font-size: 22px; font-weight: 650; letter-spacing: .2px;
-    }
-    header p {
-      margin: 0; color: var(--muted); font-size: 14px;
-    }
+    .wrap { max-width: 1100px; width: 100%; }
+    header { text-align: center; margin-bottom: 20px; }
+    header h1 { margin: 0 0 6px; font-size: 22px; font-weight: 650; letter-spacing: .2px; }
+    header p { margin: 0; color: var(--muted); font-size: 14px; }
 
     .grid {
       display: grid;
@@ -53,7 +48,7 @@
     }
     .tile {
       background: linear-gradient(180deg, #181b25 0%, #121520 100%);
-      border: 1px solid #1f2431;
+      border: 1px solid var(--border);
       border-radius: 14px;
       aspect-ratio: 1 / 1;
       display: grid; place-items: center;
@@ -61,6 +56,7 @@
       box-shadow: 0 6px 20px rgba(0,0,0,.25) inset, 0 1px 0 rgba(255,255,255,0.04);
       position: relative;
       overflow: hidden;
+      cursor: pointer;
     }
     .tile:hover {
       transform: translateY(-2px);
@@ -74,89 +70,172 @@
       line-height: 1;
       display: inline-block;
       filter: drop-shadow(0 1px 0 rgba(255,255,255,.04));
-      color: #fff; /* ícones brancos */
+      color: #fff; /* white icons */
     }
     .tile i[class*="devicon-"] {
       font-size: 54px;
       color: #fff;
     }
-    .tile:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 3px;
+    .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    footer { text-align: center; margin-top: 16px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 560px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+    /* Modal (popup) */
+    .overlay {
+      position: fixed; inset: 0; background: var(--overlay);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px; z-index: 1000;
     }
-    footer {
-      text-align: center; margin-top: 16px; color: var(--muted); font-size: 12px;
+    .overlay[open] { display: flex; }
+    .modal {
+      width: min(520px, 94vw);
+      background: var(--modal);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(91,156,255,.15);
+      padding: 18px;
     }
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(4, 1fr); }
+    .modal h2 { margin: 0 0 8px; font-size: 18px; }
+    .modal p { margin: 0 0 14px; color: var(--fg); }
+    .modal .actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .btn {
+      appearance: none; border: 1px solid var(--border); background: #0f1320; color: var(--fg);
+      padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 14px;
     }
-    @media (max-width: 560px) {
-      .grid { grid-template-columns: repeat(3, 1fr); }
-    }
+    .btn:hover { border-color: #2a3346; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <h1>Ícones em grade 6×6</h1>
-      <p>As classes estão aplicadas nos elementos (no HTML) — nada é exibido na tela além dos ícones.</p>
+      <h1>6×6 icon grid</h1>
+      <p>Classes are applied on the elements (in HTML). Only the icons are rendered on screen.</p>
     </header>
 
-    <main class="grid" aria-label="Grade de ícones interativos">
+    <main class="grid">
 
       <!-- Font Awesome -->
-      <button class="tile" aria-label="Font Awesome user"><i class="fa-solid fa-user"></i></button>
-      <button class="tile" aria-label="Font Awesome bell"><i class="fa-solid fa-bell"></i></button>
-      <button class="tile" aria-label="Font Awesome camera"><i class="fa-solid fa-camera"></i></button>
-      <button class="tile" aria-label="Font Awesome github"><i class="fa-brands fa-github"></i></button>
-      <button class="tile" aria-label="Font Awesome heart"><i class="fa-solid fa-heart"></i></button>
-      <button class="tile" aria-label="Font Awesome car"><i class="fa-solid fa-car"></i></button>
+      <button class="tile"><i class="fa-solid fa-user"></i></button>
+      <button class="tile"><i class="fa-solid fa-bell"></i></button>
+      <button class="tile"><i class="fa-solid fa-camera"></i></button>
+      <button class="tile"><i class="fa-brands fa-github"></i></button>
+      <button class="tile"><i class="fa-solid fa-heart"></i></button>
+      <button class="tile"><i class="fa-solid fa-car"></i></button>
 
       <!-- Bootstrap Icons -->
-      <button class="tile" aria-label="Bootstrap alarm"><i class="bi bi-alarm"></i></button>
-      <button class="tile" aria-label="Bootstrap battery full"><i class="bi bi-battery-full"></i></button>
-      <button class="tile" aria-label="Bootstrap cloud"><i class="bi bi-cloud"></i></button>
-      <button class="tile" aria-label="Bootstrap music note"><i class="bi bi-music-note"></i></button>
-      <button class="tile" aria-label="Bootstrap star"><i class="bi bi-star-fill"></i></button>
-      <button class="tile" aria-label="Bootstrap telephone"><i class="bi bi-telephone"></i></button>
+      <button class="tile"><i class="bi bi-alarm"></i></button>
+      <button class="tile"><i class="bi bi-battery-full"></i></button>
+      <button class="tile"><i class="bi bi-cloud"></i></button>
+      <button class="tile"><i class="bi bi-music-note"></i></button>
+      <button class="tile"><i class="bi bi-star-fill"></i></button>
+      <button class="tile"><i class="bi bi-telephone"></i></button>
 
       <!-- Remix Icon -->
-      <button class="tile" aria-label="Remix home"><i class="ri-home-line"></i></button>
-      <button class="tile" aria-label="Remix rocket"><i class="ri-rocket-line"></i></button>
-      <button class="tile" aria-label="Remix laugh"><i class="ri-emotion-laugh-line"></i></button>
-      <button class="tile" aria-label="Remix settings"><i class="ri-settings-3-line"></i></button>
-      <button class="tile" aria-label="Remix chat"><i class="ri-chat-3-fill"></i></button>
-      <button class="tile" aria-label="Remix map pin"><i class="ri-map-pin-2-line"></i></button>
+      <button class="tile"><i class="ri-home-line"></i></button>
+      <button class="tile"><i class="ri-rocket-line"></i></button>
+      <button class="tile"><i class="ri-emotion-laugh-line"></i></button>
+      <button class="tile"><i class="ri-settings-3-line"></i></button>
+      <button class="tile"><i class="ri-chat-3-fill"></i></button>
+      <button class="tile"><i class="ri-map-pin-2-line"></i></button>
 
       <!-- Boxicons -->
-      <button class="tile" aria-label="Boxicons cat"><i class="bx bxs-cat"></i></button>
-      <button class="tile" aria-label="Boxicons bulb"><i class="bx bx-bulb"></i></button>
-      <button class="tile" aria-label="Boxicons twitter"><i class="bx bxl-twitter"></i></button>
-      <button class="tile" aria-label="Boxicons ghost"><i class="bx bx-ghost"></i></button>
-      <button class="tile" aria-label="Boxicons basketball"><i class="bx bxs-basketball"></i></button>
-      <button class="tile" aria-label="Boxicons cog"><i class="bx bxs-cog"></i></button>
+      <button class="tile"><i class="bx bxs-cat"></i></button>
+      <button class="tile"><i class="bx bx-bulb"></i></button>
+      <button class="tile"><i class="bx bxl-twitter"></i></button>
+      <button class="tile"><i class="bx bx-ghost"></i></button>
+      <button class="tile"><i class="bx bxs-basketball"></i></button>
+      <button class="tile"><i class="bx bxs-cog"></i></button>
 
       <!-- Line Awesome -->
-      <button class="tile" aria-label="Line Awesome dog"><i class="las la-dog"></i></button>
-      <button class="tile" aria-label="Line Awesome dragon"><i class="las la-dragon"></i></button>
-      <button class="tile" aria-label="Line Awesome tree"><i class="las la-tree"></i></button>
-      <button class="tile" aria-label="Line Awesome robot"><i class="las la-robot"></i></button>
-      <button class="tile" aria-label="Line Awesome gamepad"><i class="las la-gamepad"></i></button>
-      <button class="tile" aria-label="Line Awesome rocket"><i class="las la-rocket"></i></button>
+      <button class="tile"><i class="las la-dog"></i></button>
+      <button class="tile"><i class="las la-dragon"></i></button>
+      <button class="tile"><i class="las la-tree"></i></button>
+      <button class="tile"><i class="las la-robot"></i></button>
+      <button class="tile"><i class="las la-gamepad"></i></button>
+      <button class="tile"><i class="las la-rocket"></i></button>
 
       <!-- Devicon -->
-      <button class="tile" aria-label="Devicon Python"><i class="devicon devicon-python-plain"></i></button>
-      <button class="tile" aria-label="Devicon JavaScript"><i class="devicon devicon-javascript-plain"></i></button>
-      <button class="tile" aria-label="Devicon React"><i class="devicon devicon-react-original"></i></button>
-      <button class="tile" aria-label="Devicon Node.js"><i class="devicon devicon-nodejs-plain"></i></button>
-      <button class="tile" aria-label="Devicon Docker"><i class="devicon devicon-docker-plain"></i></button>
-      <button class="tile" aria-label="Devicon Android"><i class="devicon devicon-android-plain"></i></button>
+      <button class="tile"><i class="devicon devicon-python-plain"></i></button>
+      <button class="tile"><i class="devicon devicon-javascript-plain"></i></button>
+      <button class="tile"><i class="devicon devicon-react-original"></i></button>
+      <button class="tile"><i class="devicon devicon-nodejs-plain"></i></button>
+      <button class="tile"><i class="devicon devicon-docker-plain"></i></button>
+      <button class="tile"><i class="devicon devicon-android-plain"></i></button>
 
     </main>
 
     <footer>
-      Dica: inspecione o elemento para ver o atributo <code>class</code> de cada ícone.
+      Tip: inspect an icon element to see its <code>class</code> attribute in the HTML.
     </footer>
   </div>
+
+  <!-- Popup (modal) -->
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+    <div class="modal">
+      <h2 id="modal-title">Icon clicked</h2>
+      <p id="modal-desc">You've clicked the icon <span id="icon-class-name"></span></p>
+      <div class="actions">
+        <button type="button" class="btn" id="close-btn">close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById('overlay');
+    const iconNameEl = document.getElementById('icon-class-name');
+    const closeBtn = document.getElementById('close-btn');
+
+    function getPrimaryIconClass(iconEl) {
+      const classes = Array.from(iconEl.classList);
+
+      // Font Awesome: 'fa-xxx' (ignore style classes)
+      const fa = classes.find(c => c.startsWith('fa-') && !['fa-solid','fa-regular','fa-brands'].includes(c));
+      if (fa) return fa;
+
+      // Bootstrap Icons: 'bi-xxx'
+      const bi = classes.find(c => c.startsWith('bi-'));
+      if (bi) return bi;
+
+      // Remix Icon: 'ri-xxx'
+      const ri = classes.find(c => c.startsWith('ri-'));
+      if (ri) return ri;
+
+      // Boxicons: bxs-/bxl-/bx- (not bare 'bx')
+      const bxs = classes.find(c => c.startsWith('bxs-') || c.startsWith('bxl-') || (c.startsWith('bx-') && c !== 'bx'));
+      if (bxs) return bxs;
+
+      // Line Awesome: 'la-xxx' (ignore 'las'/'lab')
+      const la = classes.find(c => c.startsWith('la-'));
+      if (la) return la;
+
+      // Devicon: 'devicon-xxx' (ignore bare 'devicon')
+      const dev = classes.find(c => c.startsWith('devicon-'));
+      if (dev) return dev;
+
+      return classes[0] || '(unknown)';
+    }
+
+    function openModal(iconClass) {
+      iconNameEl.textContent = iconClass;
+      overlay.setAttribute('open', '');
+      setTimeout(() => closeBtn.focus(), 0);
+    }
+    function closeModal() {
+      overlay.removeAttribute('open');
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    document.querySelectorAll('.tile').forEach(tile => {
+      tile.addEventListener('click', () => {
+        const icon = tile.querySelector('i');
+        const primary = icon ? getPrimaryIconClass(icon) : '(unknown)';
+        openModal(primary);
+      });
+    });
+  </script>
 </body>
 </html>
