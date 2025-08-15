@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>6×6 Icon Grid — classes only on the element</title>
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Remix Icon -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+  <!-- Boxicons -->
+  <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <!-- Line Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/line-awesome/css/line-awesome.min.css">
+  <!-- Devicon (tech logos) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
+
+  <style>
+    :root {
+      --bg: #0e0f13;
+      --fg: #ffffff; /* white text/icons */
+      --muted: #9aa3b2;
+      --accent: #5b9cff;
+      --overlay: rgba(0, 0, 0, .6);
+      --modal: #121520;
+      --border: #1f2431;
+
+      --cols: 6;
+      --rows: 6;
+      --gap: 14px;
+      --tile-size: 120px; /* will be updated via JS to fit viewport */
+      --wrap-max-w: 1100px;
+      --page-pad: 32px; /* body padding on each side */
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: var(--page-pad);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,Helvetica,sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, #1c2140 0%, #0e0f13 50%), var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      overflow: hidden; /* no vertical scroll */
+      display: grid;
+      place-items: center;
+    }
+    .wrap { width: 100%; max-width: var(--wrap-max-w); }
+    header { text-align: center; margin: 0 0 10px; }
+    header h1 { margin: 0 0 6px; font-size: 22px; font-weight: 650; letter-spacing: .2px; }
+    header p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 12px 0 16px;
+    }
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: #0f1320;
+      color: var(--fg);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn:hover { border-color: #2a3346; }
+
+    .grid {
+      display: grid;
+      gap: var(--gap);
+      /* size the tracks with the computed tile size */
+      grid-template-columns: repeat(var(--cols), var(--tile-size));
+      grid-auto-rows: var(--tile-size);
+      justify-content: center; /* center horizontally */
+    }
+    .tile {
+      background: linear-gradient(180deg, #181b25 0%, #121520 100%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: grid; place-items: center;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+      box-shadow: 0 6px 20px rgba(0,0,0,.25) inset, 0 1px 0 rgba(255,255,255,0.04);
+      cursor: pointer;
+    }
+    .tile:hover {
+      transform: translateY(-2px);
+      border-color: #2a3346;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35) inset, 0 0 0 1px rgba(91,156,255,.15);
+    }
+    /* icons scale with tile size */
+    .tile i,
+    .tile .devicon {
+      font-size: calc(var(--tile-size) * 0.55);
+      line-height: 1;
+      display: inline-block;
+      filter: drop-shadow(0 1px 0 rgba(255,255,255,.04));
+      color: #fff;
+    }
+    .tile i[class*="devicon-"] { font-size: calc(var(--tile-size) * 0.62); }
+    .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+    footer { text-align: center; margin-top: 10px; color: var(--muted); font-size: 12px; }
+
+    /* Modal (popup) */
+    .overlay {
+      position: fixed; inset: 0; background: var(--overlay);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px; z-index: 1000;
+    }
+    .overlay[open] { display: flex; }
+    .modal {
+      width: min(520px, 94vw);
+      background: var(--modal);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(91,156,255,.15);
+      padding: 18px;
+    }
+    .modal h2 { margin: 0 0 8px; font-size: 18px; }
+    .modal p { margin: 0 0 14px; color: var(--fg); }
+    .modal .actions { display: flex; justify-content: flex-end; gap: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header id="hdr">
+      <h1>6×6 icon grid</h1>
+      <p>Classes are applied on the elements (in HTML). Only the icons are rendered on screen.</p>
+    </header>
+
+    <div class="toolbar" id="tools">
+      <button id="btn-random" class="btn" type="button">Randomize order</button>
+      <button id="btn-reset" class="btn" type="button">Reset order</button>
+    </div>
+
+    <main class="grid" id="grid">
+      <!-- Font Awesome -->
+      <button class="tile"><i class="fa-solid fa-user"></i></button>
+      <button class="tile"><i class="fa-solid fa-bell"></i></button>
+      <button class="tile"><i class="fa-solid fa-camera"></i></button>
+      <button class="tile"><i class="fa-brands fa-github"></i></button>
+      <button class="tile"><i class="fa-solid fa-heart"></i></button>
+      <button class="tile"><i class="fa-solid fa-car"></i></button>
+      <!-- Bootstrap Icons -->
+      <button class="tile"><i class="bi bi-alarm"></i></button>
+      <button class="tile"><i class="bi bi-battery-full"></i></button>
+      <button class="tile"><i class="bi bi-cloud"></i></button>
+      <button class="tile"><i class="bi bi-music-note"></i></button>
+      <button class="tile"><i class="bi bi-star-fill"></i></button>
+      <button class="tile"><i class="bi bi-telephone"></i></button>
+      <!-- Remix Icon -->
+      <button class="tile"><i class="ri-home-line"></i></button>
+      <button class="tile"><i class="ri-rocket-line"></i></button>
+      <button class="tile"><i class="ri-emotion-laugh-line"></i></button>
+      <button class="tile"><i class="ri-settings-3-line"></i></button>
+      <button class="tile"><i class="ri-chat-3-fill"></i></button>
+      <button class="tile"><i class="ri-map-pin-2-line"></i></button>
+      <!-- Boxicons -->
+      <button class="tile"><i class="bx bxs-cat"></i></button>
+      <button class="tile"><i class="bx bx-bulb"></i></button>
+      <button class="tile"><i class="bx bxl-twitter"></i></button>
+      <button class="tile"><i class="bx bx-ghost"></i></button>
+      <button class="tile"><i class="bx bxs-basketball"></i></button>
+      <button class="tile"><i class="bx bxs-cog"></i></button>
+      <!-- Line Awesome -->
+      <button class="tile"><i class="las la-dog"></i></button>
+      <button class="tile"><i class="las la-dragon"></i></button>
+      <button class="tile"><i class="las la-tree"></i></button>
+      <button class="tile"><i class="las la-robot"></i></button>
+      <button class="tile"><i class="las la-gamepad"></i></button>
+      <button class="tile"><i class="las la-rocket"></i></button>
+      <!-- Devicon -->
+      <button class="tile"><i class="devicon devicon-python-plain"></i></button>
+      <button class="tile"><i class="devicon devicon-javascript-plain"></i></button>
+      <button class="tile"><i class="devicon devicon-react-original"></i></button>
+      <button class="tile"><i class="devicon devicon-nodejs-plain"></i></button>
+      <button class="tile"><i class="devicon devicon-docker-plain"></i></button>
+      <button class="tile"><i class="devicon devicon-android-plain"></i></button>
+    </main>
+
+    <footer id="ftr">
+      Tip: inspect an icon element to see its <code>class</code> attribute in the HTML.
+    </footer>
+  </div>
+
+  <!-- Popup (modal) -->
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+    <div class="modal">
+      <h2 id="modal-title">Icon clicked</h2>
+      <p id="modal-desc">You've clicked the icon <span id="icon-class-name"></span></p>
+      <div class="actions">
+        <button type="button" class="btn" id="close-btn">close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById('overlay');
+    const iconNameEl = document.getElementById('icon-class-name');
+    const closeBtn = document.getElementById('close-btn');
+    const grid = document.getElementById('grid');
+    const header = document.getElementById('hdr');
+    const toolbar = document.getElementById('tools');
+    const footer = document.getElementById('ftr');
+    const originalOrder = Array.from(grid.children); // keep references to original nodes
+
+    // pick the main class for the popup
+    function getPrimaryIconClass(iconEl) {
+      const classes = Array.from(iconEl.classList);
+      const fa  = classes.find(c => c.startsWith('fa-') && !['fa-solid','fa-regular','fa-brands'].includes(c));
+      if (fa) return fa;
+      const bi  = classes.find(c => c.startsWith('bi-')); if (bi) return bi;
+      const ri  = classes.find(c => c.startsWith('ri-')); if (ri) return ri;
+      const bx  = classes.find(c => c.startsWith('bxs-') || c.startsWith('bxl-') || (c.startsWith('bx-') && c !== 'bx')); if (bx) return bx;
+      const la  = classes.find(c => c.startsWith('la-')); if (la) return la;
+      const dev = classes.find(c => c.startsWith('devicon-')); if (dev) return dev;
+      return classes[0] || '(unknown)';
+    }
+
+    function openModal(iconClass) {
+      iconNameEl.textContent = iconClass;
+      overlay.setAttribute('open', '');
+      setTimeout(() => closeBtn.focus(), 0);
+    }
+    function closeModal() { overlay.removeAttribute('open'); }
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    // listeners on tiles (persist across reorders because nodes are the same)
+    document.querySelectorAll('.tile').forEach(tile => {
+      tile.addEventListener('click', () => {
+        const icon = tile.querySelector('i');
+        const primary = icon ? getPrimaryIconClass(icon) : '(unknown)';
+        openModal(primary);
+      });
+    });
+
+    // randomize / reset
+    function shuffleNodes(nodes) {
+      for (let i = nodes.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [nodes[i], nodes[j]] = [nodes[j], nodes[i]];
+      }
+      return nodes;
+    }
+    document.getElementById('btn-random').addEventListener('click', () => {
+      grid.replaceChildren(...shuffleNodes(Array.from(grid.children)));
+    });
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      grid.replaceChildren(...originalOrder);
+    });
+
+    // === Fit-to-viewport layout (no vertical scroll) ===
+    function px(n) { return Math.max(0, Math.floor(n)) + 'px'; }
+    function computeTileSize() {
+      const styles = getComputedStyle(document.body);
+      const bodyPadX = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+      const bodyPadY = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+      const vw = document.documentElement.clientWidth;
+      const vh = document.documentElement.clientHeight;
+
+      const cols = 6, rows = 6;
+      const gap = parseFloat(getComputedStyle(grid).gap) || 14;
+      const maxWrap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--wrap-max-w')) || 1100;
+
+      // Horizontal space available for grid
+      const availableW = Math.min(vw - bodyPadX, maxWrap);
+      // Vertical space available for grid (subtract header/toolbar/footer heights + body padding)
+      const availableH = vh - bodyPadY - header.offsetHeight - toolbar.offsetHeight - footer.offsetHeight;
+
+      const tileW = (availableW - gap * (cols - 1)) / cols;
+      const tileH = (availableH - gap * (rows - 1)) / rows;
+
+      const tileSize = Math.max(1, Math.floor(Math.min(tileW, tileH))); // keep ≥1px
+      grid.style.setProperty('--tile-size', px(tileSize));
+    }
+
+    // initial and on resize (debounced)
+    let resizeTimer;
+    function onResize() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(computeTileSize, 50);
+    }
+    window.addEventListener('resize', onResize);
+    window.addEventListener('load', computeTileSize);
+    // also recompute after fonts/styles load
+    setTimeout(computeTileSize, 0);
+  </script>
+</body>
+</html>
